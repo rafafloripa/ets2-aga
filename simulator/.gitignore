@@ -1,0 +1,15 @@
+*.bak
+.classpath
+.gradle
+.project
+.settings
+.idea
+*.iml
+*.ipr
+*.iws
+classes
+libs
+bin
+build
+reports
+src/main/java/META-INF

@@ -1,0 +1,161 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'pmd'
+apply plugin: 'jacoco'
+apply plugin: 'application'
+
+
+targetCompatibility = 1.8
+sourceCompatibility = 1.8
+
+version = '1.3-SNAPSHOT'
+
+jacoco {
+    toolVersion = "0.7.0.201403182114"
+}
+
+jacocoTestReport {
+    group = "Reporting"
+    description = "Generate Jacoco coverage reports after running tests."
+    additionalSourceDirs = files(sourceSets.main.allJava.srcDirs)
+}
+
+jar {
+    baseName='Simulator'
+    manifest {
+        attributes 'Implementation-Title': 'Simulator', 'Implementation-Version': version
+    }
+}
+
+mainClassName = "combitech.sdp.dummy.Server"
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    dll
+}
+
+dependencies {
+    dll 'net.java.jinput:jinput-platform:2.0.5:natives-linux'
+    dll 'net.java.jinput:jinput-platform:2.0.5:natives-osx'
+    dll 'net.java.jinput:jinput-platform:2.0.5:natives-windows'
+	compile 'net.java.jinput:jinput:2.0.5'
+    compile 'org.slf4j:slf4j-api:1.7.7'
+    compile 'com.neuronrobotics:nrjavaserial:3.7.5.1'
+    compile 'ch.qos.logback:logback-classic:1.1.2'
+   	compile 'org.slf4j:slf4j-api:1.7.7'
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+    testCompile 'info.cukes:cucumber-java:1.1.6'
+    testCompile 'info.cukes:cucumber-junit:1.1.6'
+    testCompile 'info.cukes:cucumber-core:1.1.6'
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+    compile fileTree(dir: 'libs', include: '*.jar')
+}
+
+eclipse {
+    classpath {
+        minusConfigurations += configurations.dll
+    }
+}
+
+task copyBuildDependencies(type: Copy) {
+	from {
+    	configurations.dll.filter{it.name.endsWith('windows.jar')}.collect { 
+    		zipTree(it)
+    	}
+	}
+    into 'build/lib/natives'
+}
+
+task copyBinDependencies(type: Copy) {
+    from {
+        configurations.dll.filter { it.name.endsWith('windows.jar') }.collect {
+            zipTree(it)
+        }
+    }
+    into 'bin/lib/natives'
+}
+
+eclipse.classpath.file {
+     withXml { xml ->    
+     	xml.asNode().classpathentry.findAll{
+			it.@path.endsWith('jinput-2.0.5.jar')
+        }.each{
+			it.appendNode('attributes').appendNode(
+				'attribute',
+           		[name: 'org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY', value: project.name+'/libs/natives']
+           	)
+        }
+        //xml.asNode().appendNode('classpathentry', [kind: 'src', path: 'src'])
+	}
+}
+
+task downloadSDP(type: MyDownload) {
+    sourceUrl = 'http://developer.lindholmen.se/repo/artifacts/SDP/SNAPSHOT/SDP-1.3-SNAPSHOT.jar'
+    target = file('libs/SDP-1.3-SNAPSHOT.jar')
+}
+
+task downloadVilConfig(type: MyDownload) {
+    sourceUrl = 'http://developer.lindholmen.se/repo/artifacts/VIL/SNAPSHOT/VIL-1.3-SNAPSHOT.jar'
+    target = file('libs/VIL-1.3-SNAPSHOT.jar')
+}
+task downloadAutomotiveAPI(type: MyDownload) {
+    sourceUrl = 'http://developer.lindholmen.se/repo/artifacts/Automotive-API/SNAPSHOT/Automotive-API-1.3-SNAPSHOT.jar'
+    target = file('libs/Automotive-API-1.3-SNAPSHOT.jar')
+}
+
+class MyDownload extends DefaultTask {
+    @Input
+    String sourceUrl
+
+    @OutputFile
+    File target
+
+    @TaskAction
+    void download() {
+        ant.get(src: sourceUrl, dest: target)
+    }
+}
+
+compileJava.dependsOn copyBuildDependencies
+compileJava.dependsOn copyBinDependencies
+compileJava.dependsOn downloadSDP
+compileJava.dependsOn downloadVilConfig
+compileJava.dependsOn downloadAutomotiveAPI
+
+task libsClean(type: Delete) {
+    delete 'libs'
+}
+
+clean.dependsOn libsClean
+
+configurations {
+    cucumberRuntime {
+        extendsFrom testRuntime
+    }
+}
+
+task acceptanceTest() {
+	
+    dependsOn assemble, compileTestJava 
+    doLast {
+        javaexec {
+            main = "cucumber.api.cli.Main"
+            classpath = configurations.cucumberRuntime + sourceSets.main.output + sourceSets.test.output
+            args = ['-f', 'pretty', '--monochrome', '--glue', 'acceptancetest', 'src/test/java/acceptancetest','-f', 'json:build/cucumber-reports/cucumber.json']
+        }
+    }
+}
+
+task copyArtifacts(type: Copy) {
+    from 'build/libs'
+    into '/srv/repo/artifacts/Simulator/SNAPSHOT/'
+}
+
+pmd {
+    ignoreFailures = true
+    ruleSetFiles = files("config/pmd/sdp.xml")
+}

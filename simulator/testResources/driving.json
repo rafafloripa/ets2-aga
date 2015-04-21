@@ -1,0 +1,10 @@
+{"timestamp": 1351181576.64078, "name": "engine_speed", "value": 714.0}
+{"timestamp": 1351181576.64578, "name": "vehicle_speed", "value": 0.0}
+{"timestamp": 1351181576.6507802, "name": "brake_pedal_status", "value": true}
+{"timestamp": 1351181576.6557803, "name": "latitude", "value": 42.291595}
+{"timestamp": 1351181576.64078, "name": "engine_speed", "value": 914.0}
+{"timestamp": 1351181576.64578, "name": "vehicle_speed", "value": 1.0}
+{"timestamp": 1351181576.680781, "name": "steering_wheel_angle", "value": 8.0868}
+{"timestamp": 1351181588.8160586, "name": "transmission_gear_position", "value": "first"}
+{"timestamp": 1351181576.64078, "name": "engine_speed", "value": 1514.0}
+{"timestamp": 1351181576.64578, "name": "vehicle_speed", "value": 7.0}
