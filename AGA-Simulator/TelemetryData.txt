@@ -1,0 +1,4 @@
+Speed: 0.0
+Engine RPM: 0.0
+Fuel: 0.0
+Fuel capacity: 0.0

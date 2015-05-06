@@ -1,0 +1,21 @@
+N/A	-	Triangle 		- 	Button._0		-	1 << 	
+N/A	-	Circle			-	Button._1		-	1 << 
+N/A	-	Cross			-	Button._2		-	1 << 
+N/A	-	Square			-	Button._3		-	1 << 
+
+home	-	Select		-	Button._8		-	1 << 0
+app		-	Start		-	Button._9		-	1 << 1
+select	-	R3			-	Button._11		-	1 << 2
+back	-	L3			-	Button._10		-	1 << 3
+up		-	up			-	Axis.POV (0.25)	-	1 << 4
+right	-	right		-	Axis.POV (0.50)	-	1 << 5
+down	-	down		-	Axis.POV (0.75)	-	1 << 6
+left	-	left		-	Axis.POV (1.00)	-	1 << 7
+plus	-	R2			-	Button._4		-	1 << 9
+minus	-	R1			-	Button._7		-	1 << 8
+power	-	cross		-	button._02		-	1 << 10
+
+TORCS	-	L2			-	Button._5		-	1 << 
+TORCS	-	L1			-	Button._6		-	1 << 
+TORCS	-	Left_pedal	-	Button._1		-	1 << 
+TORCS	-	Right_pedal	-	Button._0		-	1 << 
